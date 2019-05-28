@@ -1,5 +1,128 @@
 #!/usr/bin/env ruby
+class Application
 
+    attr_accessor :Quintupla
+    def initialize
+        @Quintupla = {
+            'E'=>nil,
+            'K'=>nil,
+            'L'=>nil,
+            'S'=>nil,
+            'F'=>nil
+        }
+        automata
+        mainMenu
+    end
+    def automata()
+        puts "Antes de ingresar a la aplicación de afd-afnd se debe ingresar la quintupla correspondiente."
+        puts "Quintupla correspondiente"
+        puts "1) Estados del autómata"
+        @contador=0
+        @K = {}
+        while (@kpt!=1)
+            @contador+=1
+            puts "Nombre del estado "+ @contador.to_s + ":"
+            @nom = gets.chomp
+            @K[@nom] = nil
+            puts "¿Desea agregar otro estado? 1: si , 0: no"
+            opt = gets.chomp 
+            if (opt.to_i==0) 
+                @kpt=1
+            end 
+        end 
+        puts "2) Transiciones del autómata"
+        puts "Los estados ingresados son los siguientes"
+        @L = {}
+        @K.each do |key,value|
+            puts "Estado '" + key + "'"
+        end
+        puts "A continuación ingrese las transiciones respectivas"
+        @K.each do |key|
+            puts "Transición del estado" + key + ""
+            tran = gets.chomp
+            puts " hasta el estado"
+            ef = gets.chomp
+            @L[key]= {
+                tran.to_s => ef.to_s
+            }
+            puts "¿Desea añadir otra transición al estado? 1 : si, 0 : no"
+            opt = gets.chomp
+            while (opt==1)
+                puts "Transición del estado" + key + ""
+                tran = gets.chomp
+                puts " hasta el estado"
+                ef = gets.chomp
+                @L[key]={
+                    tran.to_s => ef.to_s
+                }
+                puts "¿Desea añadir otra transición al estado? 1 : si, 0 : no"
+                opt = gets.chomp
+            end
+        end
+        puts "Diccionario del autómata"
+        @E={}
+        while (@kpt!=1)
+            puts "Ingrese 1 caracter por vez"
+            @caracter = gets.chomp
+            @E[@caracter] = nil
+            puts "¿Desea agregar otro caracter? 1: si , 0: no"
+            opt = gets.chomp 
+            if (opt.to_i==0) 
+                @kpt=1
+            end 
+        end 
+        puts "Estados iniciales del automata"
+        @S={}
+        puts "Los estados del automata son:"
+        @K.each do |key,value|
+            puts "Estado '" + key + "'"
+        end
+        while (@kpt!=1)
+            puts "Ingrese un estado como inicial"
+            @initialState = gets.chomp 
+            while (@K.has_key(initialState)==0)
+                puts "Ingrese un estado perteneciente al autómata"
+                @initialState = gets.chomp
+            end
+            @S[@initialState] = nil
+            puts "¿Desea agregar otro estado inicial? 1: si , 0: no"
+            opt = gets.chomp 
+            if (opt.to_i==0) 
+                @kpt=1
+            end 
+        end
+        
+        puts "Estado final del automata"
+        @F={}
+        puts "Los estados del automata son:"
+        @K.each do |key,value|
+            puts "Estado '" + key + "'"
+        end
+        while (@kpt!=1)
+            puts "Ingrese un estado como final"
+            @finalState = gets.chomp 
+            while (@K.has_key(finalState)==0)
+                puts "Ingrese un estado perteneciente al autómata"
+                @finalState = gets.chomp
+            end
+            @F[finalState] = nil
+            puts "¿Desea agregar otro estado final? 1: si , 0: no"
+            opt = gets.chomp 
+            if (opt.to_i==0) 
+                @kpt=1
+            end 
+        end
+        @Quintupla[E]=@E
+        @Quintupla[K]=@K
+        @Quintupla[L]=@L
+        @Quintupla[S]= @S
+        @Quintupla[F]= @F
+    end
+
+    def mainMenu
+        puts "nothing yet"
+    end
+end
 
 def combinarListas(l1, l2)
     @aux = l1
@@ -15,6 +138,7 @@ def combinarListas(l1, l2)
         except ValueError
             listaFinal.append(l1)
     end
+    return @listaFinal
 end
 
 def conexionesConVacio(lista, nodo)
@@ -29,17 +153,33 @@ end
 
 def procesarNodo(lista, alfabeto, nodo)
     diccionario = {}
-    for tupla in lista 
+    for tupla in @lista 
         if (nodo == tupla[0])
-            for caracter in alfabeto
+            for caracter in @alfabeto
                 if (tupla[1] == caracter)
                     if (tupla[1] == caracter)
-                        if(caracter not in diccionario)
-                        diccionario[caracter] = []
+                        if(diccionario.has_key? "caracter")
+                            diccionario[caracter] = []
                         end
                     diccionario[caracter] = combinarListas(diccionario[caracter], tupla[2])
-                    
-                    end            
-            end
+                    diccionario[caracter]= combinarListas(diccionario[caracter], conexionesConVacio(lista, tupla[2]))
+                    end
+                end 
+            if (tupla[1] == "")
+                aux = procesarNodo(lista, alfabeto, tupla[2])
+                for c,e in @aux.to_a()
+                    if (diccionario.has_key? "c") 
+                        diccionario[c] = combinarListas(diccionario[c], e)
+                    else
+                        diccionario[c] = []
+                        diccionario[c] = combinarListas(diccionario[c], e)
+                    end
+                end
+            end        
         end
+        return diccionario
     end
+    end
+end
+
+Application.new
