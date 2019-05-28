@@ -179,7 +179,7 @@ def procesarNodo(lista, alfabeto, nodo)
         end
         return diccionario
     end
-    end
+end
 end
 
 Application.new
