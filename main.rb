@@ -38,8 +38,21 @@ def procesarNodo(lista, alfabeto, nodo)
                         diccionario[caracter] = []
                         end
                     diccionario[caracter] = combinarListas(diccionario[caracter], tupla[2])
-                    
-                    end            
+                    diccionario[caracter]= combinarListas(diccionario[caracter], conexionesConVacio(lista, tupla[2]))
+                    end
+                end    
+            if (tupla[1] == "")
+                aux = procesarNodo(lista, alfabeto, tupla[2])
+                for c,e in aux.items()
+                    if (c in diccionario)
+                        diccionario[c] = combinarListas(diccionario[c], e)
+                    else
+                        diccionario[c] = []
+                        diccionario[c] = combinarListas(diccionario[c], e)
+                    end
+                end
+            end        
             end
         end
+        return diccionario
     end
