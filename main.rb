@@ -1,6 +1,4 @@
 #!/usr/bin/env ruby
-
-
 def combinarListas(l1, l2)
     @aux = l1
     if type(l2) == list
@@ -29,22 +27,22 @@ end
 
 def procesarNodo(lista, alfabeto, nodo)
     diccionario = {}
-    for tupla in lista 
+    for tupla in @lista 
         if (nodo == tupla[0])
-            for caracter in alfabeto
+            for caracter in @alfabeto
                 if (tupla[1] == caracter)
                     if (tupla[1] == caracter)
-                        if(caracter not in diccionario)
-                        diccionario[caracter] = []
+                        if(diccionario.has_key? "caracter")
+                            diccionario[caracter] = []
                         end
                     diccionario[caracter] = combinarListas(diccionario[caracter], tupla[2])
                     diccionario[caracter]= combinarListas(diccionario[caracter], conexionesConVacio(lista, tupla[2]))
                     end
-                end    
+                end 
             if (tupla[1] == "")
                 aux = procesarNodo(lista, alfabeto, tupla[2])
-                for c,e in aux.items()
-                    if (c in diccionario)
+                for c,e in @aux.to_a()
+                    if (diccionario.has_key? "c") 
                         diccionario[c] = combinarListas(diccionario[c], e)
                     else
                         diccionario[c] = []
@@ -52,7 +50,8 @@ def procesarNodo(lista, alfabeto, nodo)
                     end
                 end
             end        
-            end
         end
         return diccionario
     end
+end
+end
