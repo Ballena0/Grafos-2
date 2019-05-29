@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-class menu
+class Menu
 
     def initialize 
         @exit = false
@@ -10,17 +10,16 @@ class menu
         puts "1) Ingrese palabras para saber si pertenecen al lenguaje del automata"
         puts "2) Obtener AFD equivalente (Automata= AFND)"
         puts "3) Simplificar AFD obtenido anteriormente"
-        puts "4) Estado intermedio a reducir/eliminar y mostrar la expresión regular resultante "
+        puts "4) Estado intermedio a reducir/eliminar y mostrar la expresión regular resultante (deshabilitada)"
         puts "5) Salir"
         print "Opcion: "
     end
 
     def opciones
-        opc = gets.champ.to_i.abs
-        
+        opc = gets.chomp.to_i.abs
         case opc
             when 1 then
-                "metodo pertenece_lenguaje(K)"
+                puts "metodo pertenece_lenguaje(K)"
             when 2 then
                 "metodo obtener afd equivalente(Sumatoria_estados_AFND)"
             when 3 then

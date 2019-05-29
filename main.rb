@@ -1,5 +1,8 @@
 #!/usr/bin/env ruby
 
+menuPath = __dir__ + '\Menu.rb'
+
+require menuPath
 
 
 class Application
@@ -39,8 +42,9 @@ class Application
         puts "A continuación ingrese las transiciones respectivas"
         @K.each do |key,value|
             puts "Transición del estado" + key + ""
+            puts "En caso de querer añadir una transición vacía, ingrese un ampersand (&)"
             tran = gets.chomp
-            puts " hasta el estado"
+            puts "hasta el estado"
             ef = gets.chomp
             @L[key]= {
                 tran.to_s => ef.to_s
@@ -50,6 +54,7 @@ class Application
             @opt = gets.chomp
             while (@opt.to_i==1)
                 puts "Transición del estado" + key + ""
+                puts "En caso de querer añadir una transición vacía, ingrese un ampersand (&)"
                 tran = gets.chomp
                 puts "hasta el estado"
                 ef = gets.chomp
@@ -58,7 +63,7 @@ class Application
                 @opt = gets.chomp
             end
         end
-        puts "Diccionario del autómata"
+        puts "Lenguaje del autómata"
         @E={}
         @kpt=0
         while (@kpt!=1)
@@ -71,27 +76,20 @@ class Application
                 @kpt=1
             end 
         end 
-        puts "Estados iniciales del automata"
+        puts "Estado inicial del automata"
         @S={}
         @kpt=0
         puts "Los estados del automata son:"
         @K.each do |key,value|
             puts "Estado '" + key + "'"
         end
-        while (@kpt!=1)
-            puts "Ingrese un estado como inicial"
+        puts "Ingrese un estado como inicial"
             @initialState = gets.chomp 
             while (@K.has_key?(@initialState)==0)
                 puts "Ingrese un estado perteneciente al autómata"
                 @initialState = gets.chomp
             end
             @S[@initialState] = nil
-            puts "¿Desea agregar otro estado inicial? 1: si , 0: no"
-            opt = gets.chomp 
-            if (opt.to_i==0) 
-                @kpt=1
-            end 
-        end
         
         puts "Estado final del automata"
         @F={}
@@ -115,80 +113,144 @@ class Application
             end 
         end
         @K['S']= nil
-        @Quintupla[:E]=@E
-        @Quintupla[:K]=@K
-        @Quintupla[:L]=@L
-        @Quintupla[:S]= @S
-        @Quintupla[:F]= @F
+        @Quintupla[:E]=@E           #Lenguaje 
+        @Quintupla[:K]=@K           #Estados
+        @Quintupla[:L]=@L           #Transiciones
+        @Quintupla[:S]= @S          #Estado Inicial
+        @Quintupla[:F]= @F          #Estado final
         puts "la quintupla es :"  
         puts @Quintupla
+        tabla = procesaTabla()
+        print(tabla)
+        @S.each do |nodo,nill|
+            print('si entra')
+            print(AFD(tabla,@L,nodo,@E))
+        end
     end
 
     def mainMenu
-        puts "nothing yet"
+        menu = Menu.new
+        menu.mostrar_menu
+        menu.opciones
     end
-end
 
-
-
-
-
-def combinarListas(l1, l2)
-    @aux = l1
-    if type(l2) == list
-        @aux.extend(l2)
-    else
-        @aux.append(l2)
-    end
-    @listaFinal = []
-    @aux.each do |l1|
-        try
-            listaFinal.index(l1)
-        except ValueError
-            listaFinal.append(l1)
-    end
-    return @listaFinal
-end
-
-def conexionesConVacio(lista, nodo)
-    @nodosVacios = []
-    for tupla in lista
-        if (nodo == tupla[0] and tupla[1] == '')
-            nodosVacios = combinarListas(nodosVacios, tupla[2])            
-        end
-    end
-    return @nodosVacios
-end
-
-def procesarNodo(lista, alfabeto, nodo)
-    diccionario = {}
-    for tupla in @lista 
-        if (nodo == tupla[0])
-            for caracter in @alfabeto
-                if (tupla[1] == caracter)
-                    if (tupla[1] == caracter)
-                        if(diccionario.has_key? "caracter")
-                            diccionario[caracter] = []
+    def vacios(transitions,initialState,nodoInicial)
+        transitions.each do |key,value|
+            if(key==initialState)
+                value.each do |key2,value2|
+                    if (key2=='&')
+                        nodoInicial.push(value2)                        
+                        @resp = vacios(transitions,value2,nodoInicial)
+                        if((nodoInicial==@resp)==false)
+                            nodoInicial.push(@resp)
                         end
-                    diccionario[caracter] = combinarListas(diccionario[caracter], tupla[2])
-                    diccionario[caracter]= combinarListas(diccionario[caracter], conexionesConVacio(lista, tupla[2]))
-                    end
-                end 
-            if (tupla[1] == "")
-                aux = procesarNodo(lista, alfabeto, tupla[2])
-                for c,e in @aux.to_a()
-                    if (diccionario.has_key? "c") 
-                        diccionario[c] = combinarListas(diccionario[c], e)
-                    else
-                        diccionario[c] = []
-                        diccionario[c] = combinarListas(diccionario[c], e)
                     end
                 end
-            end        
+            end
         end
-        return diccionario
+        return nodoInicial
     end
-end
+
+    def nombreNodo(arrayNodos)
+        aux=''
+        arrayNodos.each do |e|
+            aux += e
+        end
+        return aux
+    end 
+    def procesaAFD(nodoInicial,afnd,tabla)
+
+        nombreNodo = nombreNodo(nodoInicial) #Los deja en un string bonito y gordito
+        tabla[nombreNodo] = nil
+        nodoInicial.each do |elemento|
+            afnd.each do |key,value|
+                if (key==elemento)
+                    value.each do |key2,value2|
+                        nodos = []
+                        print("key2",key2)
+                        print("value2",value2)
+                        if (tabla.has_key?(key2)==false)
+                            tabla[nombreNodo] = {key2 => value2}
+                        end
+                        tabla[nombreNodo].merge!({key2 => value2})
+                        puts(key)
+                        puts(value)
+                        value2.each do |key3,value3|
+                            nodos.push(key3)
+                        end
+                        nombreNodo = nombreNodo(nodos)
+                        print(nombreNodo)
+                        if (tabla.has_key?(nombreNodo)==false)
+                            # procesaAFD(tabla[nodos],afnd,tabla) 
+                        end
+                        # nombreNodo = nombreNodo(value[value2])   
+                    end
+                end
+            end
+        end
+        return tabla
+    end
+    def AFD (afnd,transitions,initialState,alph)
+        tabla =  {}
+        nodoInicial = []
+        nodoInicial.push(initialState)
+        vacios(transitions,initialState,nodoInicial)
+        # nodoInicial.push(vacios(transitions,initialState)) #Obtiene un array de nodos iniciales
+        print(nodoInicial)
+        procesaAFD(nodoInicial,afnd,tabla)
+        return tabla
+    end
+
+    def procesaTabla()
+        tabla2 = {}
+        @K.each do |key,value|
+            aux = creaVinculos(@L,@E,key)
+            tabla2[key] = aux
+        end
+        return tabla2
+    end
+    def creaVinculos(transitions,alph,nodo)
+        @vinculos = {}
+        transitions.each do |key,value|
+            if (key==nodo)
+                value.each do |key2,value2|
+                    if (key2=='&')
+                        aux = creaVinculos(transitions,alph,value2)
+                        alph.each do |leng,valueleng|
+                            puts leng,value2
+                            if (@vinculos[leng])
+                                @vinculos[leng].merge!({value2 =>nil})
+                            else
+                                @vinculos[leng] = {value2 => nil}
+                            end
+
+                        end
+                        aux.each do |key3,value3|
+                            value3.each do |key4,value4|
+                                if (@vinculos.has_key?(key3))
+                                    @vinculos[key3].merge!({key4 => nil})
+                                else
+                                    @vinculos[key3] = {key4 => nil}
+                                end
+                            end
+                        end
+                    elsif ((@vinculos.has_key?(key2))==false)
+                        @vinculos[key2] = {value2 => nil}
+                    else 
+                        # puts @vinculos.has_key?(key2)==false
+                        @vinculos[key2].merge!({value2 => nil})
+                        vacios = vacios(transitions,value2)
+                        @vinculos[key2].merge!({vacios => nil})
+                    end
+                end
+            end
+        end
+        return @vinculos
+    end
+
+
+
 end
 
-Application.new
+
+quintupla = Application.new
