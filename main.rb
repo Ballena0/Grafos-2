@@ -1,14 +1,13 @@
 #!/usr/bin/env ruby
+
+
+
 class Application
 
     attr_accessor :Quintupla
     def initialize
         @Quintupla = {
-            'E'=>nil,
-            'K'=>nil,
-            'L'=>nil,
-            'S'=>nil,
-            'F'=>nil
+            
         }
         automata
         mainMenu
@@ -32,12 +31,13 @@ class Application
         end 
         puts "2) Transiciones del autómata"
         puts "Los estados ingresados son los siguientes"
+        @kpt=0
         @L = {}
         @K.each do |key,value|
             puts "Estado '" + key + "'"
         end
         puts "A continuación ingrese las transiciones respectivas"
-        @K.each do |key|
+        @K.each do |key,value|
             puts "Transición del estado" + key + ""
             tran = gets.chomp
             puts " hasta el estado"
@@ -45,22 +45,22 @@ class Application
             @L[key]= {
                 tran.to_s => ef.to_s
             }
+            # @L[key].merge!({ tran.to_s => ef.to_s })
             puts "¿Desea añadir otra transición al estado? 1 : si, 0 : no"
-            opt = gets.chomp
-            while (opt==1)
+            @opt = gets.chomp
+            while (@opt.to_i==1)
                 puts "Transición del estado" + key + ""
                 tran = gets.chomp
-                puts " hasta el estado"
+                puts "hasta el estado"
                 ef = gets.chomp
-                @L[key]={
-                    tran.to_s => ef.to_s
-                }
+                @L[key].merge!({ tran.to_s => ef.to_s })
                 puts "¿Desea añadir otra transición al estado? 1 : si, 0 : no"
-                opt = gets.chomp
+                @opt = gets.chomp
             end
         end
         puts "Diccionario del autómata"
         @E={}
+        @kpt=0
         while (@kpt!=1)
             puts "Ingrese 1 caracter por vez"
             @caracter = gets.chomp
@@ -73,6 +73,7 @@ class Application
         end 
         puts "Estados iniciales del automata"
         @S={}
+        @kpt=0
         puts "Los estados del automata son:"
         @K.each do |key,value|
             puts "Estado '" + key + "'"
@@ -80,7 +81,7 @@ class Application
         while (@kpt!=1)
             puts "Ingrese un estado como inicial"
             @initialState = gets.chomp 
-            while (@K.has_key(initialState)==0)
+            while (@K.has_key?(@initialState)==0)
                 puts "Ingrese un estado perteneciente al autómata"
                 @initialState = gets.chomp
             end
@@ -94,6 +95,7 @@ class Application
         
         puts "Estado final del automata"
         @F={}
+        @kpt=0
         puts "Los estados del automata son:"
         @K.each do |key,value|
             puts "Estado '" + key + "'"
@@ -101,28 +103,35 @@ class Application
         while (@kpt!=1)
             puts "Ingrese un estado como final"
             @finalState = gets.chomp 
-            while (@K.has_key(finalState)==0)
+            while (@K.has_key?(@finalState)==0)
                 puts "Ingrese un estado perteneciente al autómata"
                 @finalState = gets.chomp
             end
-            @F[finalState] = nil
+            @F[@finalState] = nil
             puts "¿Desea agregar otro estado final? 1: si , 0: no"
             opt = gets.chomp 
             if (opt.to_i==0) 
                 @kpt=1
             end 
         end
-        @Quintupla[E]=@E
-        @Quintupla[K]=@K
-        @Quintupla[L]=@L
-        @Quintupla[S]= @S
-        @Quintupla[F]= @F
+        @K['S']= nil
+        @Quintupla[:E]=@E
+        @Quintupla[:K]=@K
+        @Quintupla[:L]=@L
+        @Quintupla[:S]= @S
+        @Quintupla[:F]= @F
+        puts "la quintupla es :"  
+        puts @Quintupla
     end
 
     def mainMenu
         puts "nothing yet"
     end
 end
+
+
+
+
 
 def combinarListas(l1, l2)
     @aux = l1
