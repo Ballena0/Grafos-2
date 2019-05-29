@@ -18,7 +18,7 @@ class Application
     def automata()
         puts "Antes de ingresar a la aplicación de afd-afnd se debe ingresar la quintupla correspondiente."
         puts "Quintupla correspondiente"
-        puts "1) Estados del autómata"
+        puts "1) *****Estados del autómata*****"
         @contador=0
         @K = {}
         while (@kpt!=1)
@@ -26,72 +26,118 @@ class Application
             puts "Nombre del estado "+ @contador.to_s + ":"
             @nom = gets.chomp
             @K[@nom] = nil
-            puts "¿Desea agregar otro estado? 1: si , 0: no"
-            opt = gets.chomp 
-            if (opt.to_i==0) 
+            puts "¿Desea agregar otro estado? 1: SI , otro valor: NO"
+            opt = gets.chomp.to_s
+            if (opt.to_s!="1") 
                 @kpt=1
-            end 
+            end
         end 
-        puts "2) Transiciones del autómata"
         puts "Los estados ingresados son los siguientes"
-        @kpt=0
-        @L = {}
         @K.each do |key,value|
             puts "Estado '" + key + "'"
         end
-        puts "A continuación ingrese las transiciones respectivas"
-        @K.each do |key,value|
-            puts "Transición del estado" + key + ""
-            puts "En caso de querer añadir una transición vacía, ingrese un ampersand (&)"
-            tran = gets.chomp
-            puts "hasta el estado"
-            ef = gets.chomp
-            @L[key]= {
-                tran.to_s => ef.to_s
-            }
-            # @L[key].merge!({ tran.to_s => ef.to_s })
-            puts "¿Desea añadir otra transición al estado? 1 : si, 0 : no"
-            @opt = gets.chomp
-            while (@opt.to_i==1)
-                puts "Transición del estado" + key + ""
-                puts "En caso de querer añadir una transición vacía, ingrese un ampersand (&)"
-                tran = gets.chomp
-                puts "hasta el estado"
-                ef = gets.chomp
-                @L[key].merge!({ tran.to_s => ef.to_s })
-                puts "¿Desea añadir otra transición al estado? 1 : si, 0 : no"
-                @opt = gets.chomp
-            end
-        end
-        puts "Lenguaje del autómata"
+        puts "2) *****Lenguaje del autómata*****"
         @E={}
-        @kpt=0
-        while (@kpt!=1)
+        while (true)
             puts "Ingrese 1 caracter por vez"
             @caracter = gets.chomp
             @E[@caracter] = nil
-            puts "¿Desea agregar otro caracter? 1: si , 0: no"
+            puts "¿Desea agregar otro elemento del lenguaje? 1: SI , otro valor: NO"
             opt = gets.chomp 
-            if (opt.to_i==0) 
-                @kpt=1
+            if (opt.to_s!="1") 
+                break
             end 
         end 
-        puts "Estado inicial del automata"
-        @S={}
+        puts "3) *****Transiciones del autómata*****"
+        puts "A continuación ingrese las transiciones respectivas"
+        puts "En caso de querer añadir una transición vacía, ingrese un ampersand (&)"
+        @L = {}
         @kpt=0
+        @aux=[]
+        @K.each do |key,value|
+            @aux.push(key.to_s)
+        end
+        @aux.each do |elemento|
+            while (true) #while para validar si la transicion existe en el lenguaje 
+                puts "Transición del estado" + elemento + ""
+                tran = gets.chomp
+                @E.each do |key,value|
+                    if ((key.to_s==tran.to_s))
+                        @kpt=1
+                    elsif (tran.to_s=='&')
+                        @kpt=1
+                    end
+                end
+                if (@kpt==1)
+                    break
+                end
+                puts "No existe el elemento en el lenguaje. Intente otra vez..."
+            end
+            @kpt=0
+            while (@kpt!=1) #while para validar datos
+                puts "Estado destino(debe existir): "
+                ef = gets.chomp
+                @K.each do |key,value|
+                    if (key.to_s==ef.to_s)
+                        @kpt=1
+                    end 
+                end
+            end
+            @L[elemento]= {
+                tran.to_s => ef.to_s
+            }
+            # @L[key].merge!({ tran.to_s => ef.to_s })
+            puts "¿Desea añadir otra transición al estado? 1 : SI, otro valor : NO"
+            puts "En caso de querer añadir una transición vacía, ingrese un ampersand (&)"
+            @opt = gets.chomp
+            while (@opt.to_s=="1")
+                while (true) #while para validar si la transicion existe en el lenguaje 
+                    puts "Transición del estado" + elemento + ""
+                    tran = gets.chomp
+                    @E.each do |key,value|
+                        if (key.to_s==tran.to_s)
+                            @kpt=1
+                        end
+                    end
+                    if (@kpt==1)
+                        break
+                    end
+                    puts "No existe el elemento en el lenguaje. Intente otra vez..."
+                end
+                @kpt=0
+                while (@kpt!=1) #while para validar datos
+                    puts "Estado destino(debe existir): "
+                    ef = gets.chomp
+                    @K.each do |key,value|
+                        if (key.to_s==ef.to_s)
+                            @kpt=1
+                        end
+                    end
+                end
+                @L[elemento]= {
+                    tran.to_s => ef.to_s
+                }
+                @L[elemento].merge!({ tran.to_s => ef.to_s })
+                puts "¿Desea añadir otra transición al estado? 1 : SI, otro valor : NO"
+                puts "En caso de querer añadir una transición vacía, ingrese un ampersand (&)"
+                @opt = gets.chomp
+            end
+        end
+        puts "4) *****Estado inicial del automata*****"
+        @S={}
         puts "Los estados del automata son:"
         @K.each do |key,value|
             puts "Estado '" + key + "'"
         end
-        puts "Ingrese un estado como inicial"
-            @initialState = gets.chomp 
-            while (@K.has_key?(@initialState)==0)
-                puts "Ingrese un estado perteneciente al autómata"
-                @initialState = gets.chomp
-            end
-            @S[@initialState] = nil
-        
-        puts "Estado final del automata"
+        puts "Ingrese un estado como inicial: "
+        @initialState = gets.chomp 
+        while (@K.has_key?(@initialState)==0)
+            puts "Ingrese un estado perteneciente al autómata"
+            @initialState = gets.chomp
+        end
+        @S[@initialState] = nil
+    
+        puts "5) *****Estado(s) final(es) del automata*****"
         @F={}
         @kpt=0
         puts "Los estados del automata son:"
@@ -99,16 +145,16 @@ class Application
             puts "Estado '" + key + "'"
         end
         while (@kpt!=1)
-            puts "Ingrese un estado como final"
+            puts "Ingrese un estado como final:"
             @finalState = gets.chomp 
             while (@K.has_key?(@finalState)==0)
                 puts "Ingrese un estado perteneciente al autómata"
                 @finalState = gets.chomp
             end
             @F[@finalState] = nil
-            puts "¿Desea agregar otro estado final? 1: si , 0: no"
+            puts "¿Desea agregar otro estado final? 1 : SI, otro valor : NO"
             opt = gets.chomp 
-            if (opt.to_i==0) 
+            if (opt.to_s!="1") 
                 @kpt=1
             end 
         end
